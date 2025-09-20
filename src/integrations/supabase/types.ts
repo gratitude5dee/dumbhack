@@ -14,7 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      anonymous_sessions: {
+        Row: {
+          created_at: string | null
+          fingerprint: string
+          fish_created: number | null
+          id: string
+          last_active: string | null
+          votes_cast: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          fingerprint: string
+          fish_created?: number | null
+          id?: string
+          last_active?: string | null
+          votes_cast?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          fingerprint?: string
+          fish_created?: number | null
+          id?: string
+          last_active?: string | null
+          votes_cast?: number | null
+        }
+        Relationships: []
+      }
+      fish: {
+        Row: {
+          ai_confidence: number | null
+          ai_score: number | null
+          canvas_dimensions: Json | null
+          client_fingerprint: string | null
+          created_at: string | null
+          downvotes: number | null
+          drawing_data: Json | null
+          drawing_duration: number | null
+          flagged_for_review: boolean | null
+          id: string
+          image_url: string
+          is_approved: boolean | null
+          is_fish: boolean | null
+          is_visible: boolean | null
+          thumbnail_url: string | null
+          updated_at: string | null
+          upvotes: number | null
+          user_id: string | null
+          view_count: number | null
+          vote_count: number | null
+        }
+        Insert: {
+          ai_confidence?: number | null
+          ai_score?: number | null
+          canvas_dimensions?: Json | null
+          client_fingerprint?: string | null
+          created_at?: string | null
+          downvotes?: number | null
+          drawing_data?: Json | null
+          drawing_duration?: number | null
+          flagged_for_review?: boolean | null
+          id?: string
+          image_url: string
+          is_approved?: boolean | null
+          is_fish?: boolean | null
+          is_visible?: boolean | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          upvotes?: number | null
+          user_id?: string | null
+          view_count?: number | null
+          vote_count?: number | null
+        }
+        Update: {
+          ai_confidence?: number | null
+          ai_score?: number | null
+          canvas_dimensions?: Json | null
+          client_fingerprint?: string | null
+          created_at?: string | null
+          downvotes?: number | null
+          drawing_data?: Json | null
+          drawing_duration?: number | null
+          flagged_for_review?: boolean | null
+          id?: string
+          image_url?: string
+          is_approved?: boolean | null
+          is_fish?: boolean | null
+          is_visible?: boolean | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          upvotes?: number | null
+          user_id?: string | null
+          view_count?: number | null
+          vote_count?: number | null
+        }
+        Relationships: []
+      }
+      votes: {
+        Row: {
+          client_fingerprint: string | null
+          created_at: string | null
+          fish_id: string
+          id: string
+          user_id: string | null
+          vote_type: string
+        }
+        Insert: {
+          client_fingerprint?: string | null
+          created_at?: string | null
+          fish_id: string
+          id?: string
+          user_id?: string | null
+          vote_type: string
+        }
+        Update: {
+          client_fingerprint?: string | null
+          created_at?: string | null
+          fish_id?: string
+          id?: string
+          user_id?: string | null
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_fish_id_fkey"
+            columns: ["fish_id"]
+            isOneToOne: false
+            referencedRelation: "fish"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
