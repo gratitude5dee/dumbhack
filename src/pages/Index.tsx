@@ -68,6 +68,12 @@ const Index = () => {
                 Collection
               </Link>
               <Link 
+                to="/store" 
+                className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Store
+              </Link>
+              <Link 
                 to="/rankings" 
                 className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
