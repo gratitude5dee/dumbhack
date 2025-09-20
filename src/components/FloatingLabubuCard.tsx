@@ -1,0 +1,231 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Heart, MessageCircle, Eye, Calendar, Trash2, Clock } from 'lucide-react';
+import { Fish } from '@/types/fish';
+import { cn } from '@/lib/utils';
+import { useMasterUserStore } from '@/stores/masterUserStore';
+import { FishService } from '@/services/fishService';
+import { useToast } from '@/hooks/use-toast';
+
+interface FloatingLabubuCardProps {
+  fish: Fish;
+  onVote: (fishId: string, voteType: 'up' | 'down') => void;
+  onDelete?: (fishId: string) => void;
+  className?: string;
+}
+
+export const FloatingLabubuCard: React.FC<FloatingLabubuCardProps> = ({ 
+  fish, 
+  onVote, 
+  onDelete, 
+  className 
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const { isMasterUser } = useMasterUserStore();
+  const { toast } = useToast();
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  const handleVote = (voteType: 'up' | 'down') => {
+    if (hasVoted || !onVote) return;
+    onVote(fish.id, voteType);
+    setHasVoted(true);
+  };
+
+  const handleDelete = async () => {
+    if (!isMasterUser) return;
+    
+    const success = await FishService.deleteFish(fish.id);
+    if (success) {
+      toast({
+        title: 'Labubu Deleted',
+        description: 'The Labubu has been successfully removed.',
+      });
+      onDelete?.(fish.id);
+    } else {
+      toast({
+        title: 'Delete Failed',
+        description: 'Could not delete the Labubu. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <motion.div
+      className={cn('relative group', className)}
+      onHoverStart={() => setShowTooltip(true)}
+      onHoverEnd={() => setShowTooltip(false)}
+      whileHover={{ scale: 1.05, zIndex: 50 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* Main Labubu Image - Clean, no borders */}
+      <div className="relative">
+        <motion.div
+          className={cn(
+            'w-24 h-24 rounded-2xl overflow-hidden shadow-lg bg-white/90 backdrop-blur-sm',
+            !imageLoaded && 'animate-pulse bg-gray-200'
+          )}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: imageLoaded ? 1 : 0.7, 
+            scale: 1,
+            rotate: [0, 1, -1, 0]
+          }}
+          transition={{ 
+            rotate: { 
+              duration: 8, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }
+          }}
+        >
+          <img
+            src={fish.thumbnail_url || fish.image_url}
+            alt={`Labubu by ${fish.user_name || 'Anonymous'}`}
+            className="w-full h-full object-contain p-1"
+            onLoad={() => setImageLoaded(true)}
+            loading="lazy"
+          />
+          
+          {/* AI Score Badge - Subtle */}
+          {fish.ai_score && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute -top-1 -right-1 bg-green-400/90 text-white text-xs px-1.5 py-0.5 rounded-full font-bold shadow-sm"
+            >
+              {Math.round(fish.ai_score * 100)}%
+            </motion.div>
+          )}
+
+          {/* Vote Score - Floating */}
+          {fish.vote_count !== 0 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className={cn(
+                'absolute -bottom-1 -left-1 text-xs px-2 py-1 rounded-full font-bold shadow-sm backdrop-blur-sm',
+                fish.vote_count > 0 
+                  ? 'bg-green-500/90 text-white' 
+                  : 'bg-red-500/90 text-white'
+              )}
+            >
+              {fish.vote_count > 0 ? '+' : ''}{fish.vote_count}
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Tooltip - Elegant overlay */}
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+            className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-50"
+          >
+            <div className="bg-black/80 text-white text-xs rounded-lg px-3 py-2 shadow-2xl backdrop-blur-sm min-w-max">
+              {/* Arrow */}
+              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-black/80 rotate-45"></div>
+              
+              {/* Content */}
+              <div className="space-y-1.5">
+                {fish.user_name && (
+                  <div className="font-semibold text-blue-200">
+                    By {fish.user_name}
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-3 text-gray-300">
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-3 h-3 fill-current" />
+                    <span>{fish.upvotes}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    <span>{fish.view_count}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{formatDate(fish.created_at)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Action Buttons - Only visible on hover */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: showTooltip ? 1 : 0, 
+            scale: showTooltip ? 1 : 0.8 
+          }}
+          className="absolute -top-2 left-1/2 transform -translate-x-1/2 flex gap-1 z-40"
+        >
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleVote('up')}
+            disabled={hasVoted}
+            className={cn(
+              'p-1.5 rounded-full bg-white/95 border shadow-lg backdrop-blur-sm transition-colors',
+              hasVoted
+                ? 'opacity-50 cursor-not-allowed'
+                : 'hover:bg-green-50 hover:border-green-400 hover:text-green-600'
+            )}
+          >
+            <Heart className="w-3 h-3" />
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleVote('down')}
+            disabled={hasVoted}
+            className={cn(
+              'p-1.5 rounded-full bg-white/95 border shadow-lg backdrop-blur-sm transition-colors',
+              hasVoted
+                ? 'opacity-50 cursor-not-allowed'
+                : 'hover:bg-red-50 hover:border-red-400 hover:text-red-600'
+            )}
+          >
+            <MessageCircle className="w-3 h-3 rotate-180" />
+          </motion.button>
+          
+          {isMasterUser && (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleDelete}
+              disabled={fish.ai_score ? fish.ai_score >= 0.3 : false}
+              className={cn(
+                'p-1.5 rounded-full border shadow-lg backdrop-blur-sm transition-colors',
+                fish.ai_score && fish.ai_score >= 0.3
+                  ? 'bg-gray-400 text-gray-600 border-gray-400 cursor-not-allowed opacity-50'
+                  : 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+              )}
+              title={fish.ai_score && fish.ai_score >= 0.3 ? `Cannot delete: ${Math.round(fish.ai_score * 100)}% similarity too high` : 'Delete this drawing'}
+            >
+              <Trash2 className="w-3 h-3" />
+            </motion.button>
+          )}
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Key } from 'lucide-react';
-import { LabubuCard } from '@/components/LabubuCard';
+import { FloatingLabubuCard } from '@/components/FloatingLabubuCard';
 import { MasterUserLogin } from '@/components/MasterUserLogin';
 import { FishService } from '@/services/fishService';
 import { Fish, SortOption } from '@/types/fish';
@@ -164,44 +164,65 @@ export default function Tank() {
             <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : (
-          <div className="absolute inset-x-6 top-32 bottom-6 bg-gradient-to-b from-blue-100/50 to-blue-200/50 rounded-2xl border-4 border-blue-300/30 overflow-hidden shadow-2xl">
+          <div className="absolute inset-x-6 top-32 bottom-6 bg-gradient-to-b from-blue-100/30 to-blue-200/40 rounded-3xl border border-blue-200/40 overflow-visible shadow-2xl backdrop-blur-sm">
+            {/* Enhanced aquatic background elements */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-1/4 left-1/6 w-20 h-20 bg-cyan-300/40 rounded-full blur-xl animate-pulse"></div>
+              <div className="absolute top-3/4 right-1/4 w-16 h-16 bg-blue-300/40 rounded-full blur-lg animate-pulse delay-1000"></div>
+              <div className="absolute top-1/2 left-3/4 w-24 h-24 bg-teal-300/40 rounded-full blur-2xl animate-pulse delay-2000"></div>
+              <div className="absolute top-1/6 right-1/6 w-12 h-12 bg-blue-400/40 rounded-full blur-md animate-pulse delay-500"></div>
+            </div>
+
             <AnimatePresence>
               {fish.map((fishItem, index) => {
-                // Generate random floating positions and animations across full tank
-                const randomX = Math.random() * 85; // 0-85% of container width
-                const randomY = Math.random() * 85; // 0-85% of container height
-                const floatDuration = 10 + Math.random() * 15; // 10-25 seconds
-                const floatDelay = Math.random() * 8; // 0-8 seconds delay
+                // Enhanced distribution algorithm for better spacing
+                const goldenRatio = (1 + Math.sqrt(5)) / 2;
+                const angle = index * 2 * Math.PI / goldenRatio;
+                const radius = Math.sqrt(index + 1) * 12; // Spiral outward
                 
-                // Create more varied floating paths
-                const pathVariationX = 25 + Math.random() * 30; // 25-55% movement range
-                const pathVariationY = 20 + Math.random() * 25; // 20-45% movement range
+                // Convert polar to cartesian with bounds
+                let baseX = 50 + (radius * Math.cos(angle)) / 2;
+                let baseY = 50 + (radius * Math.sin(angle)) / 2;
+                
+                // Add randomization to prevent perfect grid
+                const randomOffsetX = (Math.random() - 0.5) * 15;
+                const randomOffsetY = (Math.random() - 0.5) * 15;
+                
+                const finalX = Math.max(5, Math.min(90, baseX + randomOffsetX));
+                const finalY = Math.max(5, Math.min(90, baseY + randomOffsetY));
+                
+                // Varied floating parameters
+                const floatDuration = 15 + Math.random() * 20; // 15-35 seconds
+                const floatDelay = (index * 0.5) + Math.random() * 4; // Staggered start
+                
+                // Gentle floating paths
+                const pathVariationX = 8 + Math.random() * 12; // 8-20% movement
+                const pathVariationY = 6 + Math.random() * 10; // 6-16% movement
                 
                 return (
                   <motion.div
                     key={fishItem.id}
                     initial={{ 
                       opacity: 0, 
-                      x: `${randomX}%`, 
-                      y: `${randomY}%`,
-                      scale: 0.9
+                      x: `${finalX}%`, 
+                      y: `${finalY}%`,
+                      scale: 0.8
                     }}
                     animate={{ 
                       opacity: 1,
                       x: [
-                        `${randomX}%`, 
-                        `${Math.max(0, Math.min(85, randomX + pathVariationX))}%`,
-                        `${Math.max(0, Math.min(85, randomX - pathVariationX/2))}%`,
-                        `${randomX}%`
+                        `${finalX}%`, 
+                        `${Math.max(5, Math.min(90, finalX + pathVariationX))}%`,
+                        `${Math.max(5, Math.min(90, finalX - pathVariationX/2))}%`,
+                        `${finalX}%`
                       ],
                       y: [
-                        `${randomY}%`, 
-                        `${Math.max(0, Math.min(85, randomY + pathVariationY))}%`,
-                        `${Math.max(0, Math.min(85, randomY - pathVariationY/2))}%`,
-                        `${randomY}%`
+                        `${finalY}%`, 
+                        `${Math.max(5, Math.min(90, finalY + pathVariationY))}%`,
+                        `${Math.max(5, Math.min(90, finalY - pathVariationY/2))}%`,
+                        `${finalY}%`
                       ],
-                      scale: [1, 1.02, 0.98, 1],
-                      rotate: [0, 2, -2, 1, -1, 0]
+                      scale: [1, 1.05, 0.95, 1]
                     }}
                     transition={{ 
                       duration: floatDuration,
@@ -209,26 +230,31 @@ export default function Tank() {
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="absolute w-48 h-auto cursor-pointer"
-                    whileHover={{ scale: 1.1, zIndex: 10 }}
+                    className="absolute"
                   >
-                    <LabubuCard
+                    <FloatingLabubuCard
                       fish={fishItem}
                       onVote={handleVote}
                       onDelete={isMasterUser ? handleDelete : undefined}
-                      showActions={true}
-                      className="hover:shadow-2xl transition-shadow duration-300"
                     />
                   </motion.div>
                 );
               })}
             </AnimatePresence>
             
-            {/* Tank decorations */}
-            <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-green-200/40 to-transparent"></div>
-            <div className="absolute top-4 right-4 text-blue-400/60 text-6xl">🫧</div>
-            <div className="absolute top-20 left-8 text-blue-300/40 text-4xl">🫧</div>
-            <div className="absolute bottom-20 right-12 text-blue-300/50 text-5xl">🫧</div>
+            {/* Enhanced tank decorations */}
+            <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-emerald-200/30 via-teal-200/20 to-transparent"></div>
+            <div className="absolute top-6 right-8 text-blue-400/50 text-5xl animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>🫧</div>
+            <div className="absolute top-24 left-12 text-cyan-300/40 text-3xl animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>🫧</div>
+            <div className="absolute bottom-24 right-16 text-blue-300/60 text-4xl animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }}>🫧</div>
+            <div className="absolute top-32 right-1/3 text-teal-400/30 text-2xl animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '5s' }}>🫧</div>
+            <div className="absolute bottom-40 left-1/4 text-cyan-400/40 text-3xl animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '4.5s' }}>🫧</div>
+            
+            {/* Subtle water ripple effects */}
+            <div className="absolute top-0 left-0 w-full h-full">
+              <div className="absolute top-1/4 left-1/3 w-32 h-1 bg-white/10 rounded-full blur-sm animate-pulse"></div>
+              <div className="absolute top-2/3 right-1/4 w-24 h-1 bg-white/10 rounded-full blur-sm animate-pulse delay-1000"></div>
+            </div>
           </div>
         )}
 
