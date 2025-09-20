@@ -198,10 +198,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
             <p className="text-sm text-muted-foreground">AI analyzing your drawing...</p>
           ) : aiScore !== null ? (
             <p className="text-sm font-medium">
-              Fish confidence: {Math.round(aiScore * 100)}%
+              Labubu confidence: {Math.round(aiScore * 100)}%
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">Draw a fish facing right!</p>
+            <p className="text-sm text-muted-foreground">Draw a cute labubu character!</p>
           )}
         </motion.div>
       )}
@@ -250,7 +250,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
             disabled={strokes.length === 0}
             className="px-6 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Make it swim!
+            Add to collection!
           </button>
         )}
       </div>

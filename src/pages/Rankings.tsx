@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Trophy, Medal, Award } from 'lucide-react';
-import { FishCard } from '@/components/FishCard';
+import { LabubuCard } from '@/components/LabubuCard';
 import { FishService } from '@/services/fishService';
 import { Fish, SortOption, FilterOption } from '@/types/fish';
 import { useToast } from '@/hooks/use-toast';
@@ -38,18 +38,18 @@ export default function Rankings() {
   const handleVote = async (fishId: string, voteType: 'up' | 'down') => {
     const success = await FishService.voteFish(fishId, voteType);
     if (success) {
-      toast({
-        title: "Vote recorded!",
-        description: `You voted ${voteType} on this fish.`,
-      });
+        toast({
+          title: "Vote recorded!",
+          description: `You voted ${voteType} on this labubu.`,
+        });
       // Refresh fish data to show updated vote counts
       loadFish(sortBy, filter);
     } else {
-      toast({
-        title: "Cannot vote",
-        description: "You may have already voted on this fish.",
-        variant: "destructive",
-      });
+        toast({
+          title: "Cannot vote",
+          description: "You may have already voted on this labubu.",
+          variant: "destructive",
+        });
     }
   };
 
@@ -67,8 +67,8 @@ export default function Rankings() {
   ];
 
   const filterOptions = [
-    { value: 'all' as FilterOption, label: 'All Drawings' },
-    { value: 'fish-only' as FilterOption, label: 'Fish Only' },
+    { value: 'all' as FilterOption, label: 'All Labubus' },
+    { value: 'fish-only' as FilterOption, label: 'Labubu Only' },
     { value: 'high-score' as FilterOption, label: 'High AI Score' },
   ];
 
@@ -84,7 +84,7 @@ export default function Rankings() {
                 animate={{ opacity: 1, x: 0 }}
                 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"
               >
-                🐠 DrawAFish.com
+                🐰 DrawALabubu.com
               </motion.h1>
             </Link>
             <nav className="flex items-center gap-4">
@@ -98,7 +98,7 @@ export default function Rankings() {
                 to="/tank" 
                 className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
-                Tank
+                Collection
               </Link>
             </nav>
           </div>
@@ -114,7 +114,7 @@ export default function Rankings() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-4xl font-bold mb-4"
           >
-            🏆 Fish Rankings
+            🏆 Labubu Rankings
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -122,7 +122,7 @@ export default function Rankings() {
             transition={{ delay: 0.1 }}
             className="text-lg text-muted-foreground mb-6"
           >
-            Vote on fish drawings from our creative community
+            Vote on labubu drawings from our creative community
           </motion.p>
 
           {/* Controls */}
@@ -195,7 +195,7 @@ export default function Rankings() {
                 <div className="bg-gradient-to-b from-gray-100 to-gray-200 rounded-t-lg p-4 h-24 flex items-end justify-center">
                   <Medal className="w-8 h-8 text-gray-400" />
                 </div>
-                <FishCard fish={fish[1]} onVote={handleVote} />
+                <LabubuCard fish={fish[1]} onVote={handleVote} />
               </motion.div>
 
               {/* First Place */}
@@ -208,7 +208,7 @@ export default function Rankings() {
                 <div className="bg-gradient-to-b from-yellow-200 to-yellow-400 rounded-t-lg p-4 h-32 flex items-end justify-center">
                   <Trophy className="w-10 h-10 text-yellow-600" />
                 </div>
-                <FishCard fish={fish[0]} onVote={handleVote} />
+                <LabubuCard fish={fish[0]} onVote={handleVote} />
               </motion.div>
 
               {/* Third Place */}
@@ -221,7 +221,7 @@ export default function Rankings() {
                 <div className="bg-gradient-to-b from-amber-100 to-amber-200 rounded-t-lg p-4 h-20 flex items-end justify-center">
                   <Award className="w-7 h-7 text-amber-600" />
                 </div>
-                <FishCard fish={fish[2]} onVote={handleVote} />
+                <LabubuCard fish={fish[2]} onVote={handleVote} />
               </motion.div>
             </div>
           </motion.div>
@@ -235,7 +235,7 @@ export default function Rankings() {
             transition={{ delay: 0.4 }}
           >
             <h2 className="text-xl font-semibold mb-6 text-center">
-              {sortBy === 'popular' && fish.length > 3 ? 'Complete Rankings' : 'All Fish'}
+              {sortBy === 'popular' && fish.length > 3 ? 'Complete Rankings' : 'All Labubus'}
             </h2>
             <div className="space-y-4">
               {(sortBy === 'popular' && fish.length > 3 ? fish.slice(3) : fish).map((fishItem, index) => {
@@ -255,7 +255,7 @@ export default function Rankings() {
 
                     {/* Fish Card */}
                     <div className="flex-1">
-                      <FishCard
+                      <LabubuCard
                         fish={fishItem}
                         onVote={handleVote}
                         showActions={true}
@@ -277,15 +277,15 @@ export default function Rankings() {
             className="text-center py-12"
           >
             <div className="text-6xl mb-4">🏆</div>
-            <h3 className="text-xl font-semibold mb-2">No fish to rank yet</h3>
+            <h3 className="text-xl font-semibold mb-2">No labubus to rank yet</h3>
             <p className="text-muted-foreground mb-6">
-              Be the first to submit a fish and start the competition!
+              Be the first to submit a labubu and start the competition!
             </p>
             <Link
               to="/"
               className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
             >
-              Draw Your Fish
+              Draw Your Labubu
             </Link>
           </motion.div>
         )}

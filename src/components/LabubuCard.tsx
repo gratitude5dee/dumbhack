@@ -4,14 +4,14 @@ import { Heart, MessageCircle, Eye, Calendar } from 'lucide-react';
 import { Fish } from '@/types/fish';
 import { cn } from '@/lib/utils';
 
-interface FishCardProps {
+interface LabubuCardProps {
   fish: Fish;
   onVote?: (fishId: string, voteType: 'up' | 'down') => void;
   showActions?: boolean;
   className?: string;
 }
 
-export const FishCard: React.FC<FishCardProps> = ({
+export const LabubuCard: React.FC<LabubuCardProps> = ({
   fish,
   onVote,
   showActions = true,
@@ -50,7 +50,7 @@ export const FishCard: React.FC<FishCardProps> = ({
         className
       )}
     >
-      {/* Fish Image */}
+      {/* Labubu Image */}
       <div className="relative mb-3">
         <div
           className={cn(
@@ -60,7 +60,7 @@ export const FishCard: React.FC<FishCardProps> = ({
         >
           <img
             src={fish.thumbnail_url || fish.image_url}
-            alt={`Fish ${fish.id}`}
+            alt={`Labubu ${fish.id}`}
             className="w-full h-full object-contain"
             onLoad={() => setImageLoaded(true)}
             loading="lazy"
@@ -79,7 +79,7 @@ export const FishCard: React.FC<FishCardProps> = ({
         )}
       </div>
 
-      {/* Fish Info */}
+      {/* Labubu Info */}
       <div className="space-y-2">
         {/* Stats Row */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">

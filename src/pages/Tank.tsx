@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FishCard } from '@/components/FishCard';
+import { LabubuCard } from '@/components/LabubuCard';
 import { FishService } from '@/services/fishService';
 import { Fish, SortOption } from '@/types/fish';
 import { useToast } from '@/hooks/use-toast';
@@ -24,11 +24,11 @@ export default function Tank() {
       setStats(statsData);
     } catch (error) {
       console.error('Error loading fish:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load fish. Please try again.",
-        variant: "destructive",
-      });
+        toast({
+          title: "Error",
+          description: "Failed to load labubus. Please try again.",
+          variant: "destructive",
+        });
     } finally {
       setLoading(false);
     }
@@ -41,18 +41,18 @@ export default function Tank() {
   const handleVote = async (fishId: string, voteType: 'up' | 'down') => {
     const success = await FishService.voteFish(fishId, voteType);
     if (success) {
-      toast({
-        title: "Vote recorded!",
-        description: `You voted ${voteType} on this fish.`,
-      });
+        toast({
+          title: "Vote recorded!",
+          description: `You voted ${voteType} on this labubu.`,
+        });
       // Refresh fish data to show updated vote counts
       loadFish(sortBy);
     } else {
-      toast({
-        title: "Cannot vote",
-        description: "You may have already voted on this fish.",
-        variant: "destructive",
-      });
+        toast({
+          title: "Cannot vote",
+          description: "You may have already voted on this labubu.",
+          variant: "destructive",
+        });
     }
   };
 
@@ -74,7 +74,7 @@ export default function Tank() {
                 animate={{ opacity: 1, x: 0 }}
                 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"
               >
-                🐠 DrawAFish.com
+                🐰 DrawALabubu.com
               </motion.h1>
             </Link>
             <nav className="flex items-center gap-4">
@@ -104,7 +104,7 @@ export default function Tank() {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl md:text-4xl font-bold mb-4"
           >
-            Community Fish Tank 🐠
+            Community Labubu Collection 🐰
           </motion.h1>
           
           {/* Stats */}
@@ -116,7 +116,7 @@ export default function Tank() {
           >
             <div>
               <span className="font-bold text-lg text-foreground">{stats.totalFish}</span>
-              <div>Fish Swimming</div>
+              <div>Labubus Created</div>
             </div>
             <div>
               <span className="font-bold text-lg text-foreground">{stats.totalVotes}</span>
@@ -173,7 +173,7 @@ export default function Tank() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <FishCard
+                  <LabubuCard
                     fish={fishItem}
                     onVote={handleVote}
                     showActions={true}
@@ -191,16 +191,16 @@ export default function Tank() {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <div className="text-6xl mb-4">🐠</div>
-            <h3 className="text-xl font-semibold mb-2">No fish in the tank yet</h3>
+            <div className="text-6xl mb-4">🐰</div>
+            <h3 className="text-xl font-semibold mb-2">No labubus in the collection yet</h3>
             <p className="text-muted-foreground mb-6">
-              Be the first to add a fish to the community tank!
+              Be the first to add a labubu to the community collection!
             </p>
             <Link
               to="/"
               className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
             >
-              Draw Your First Fish
+              Draw Your First Labubu
             </Link>
           </motion.div>
         )}
@@ -217,7 +217,7 @@ export default function Tank() {
               to="/"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
             >
-              🎨 Draw Your Own Fish
+              🎨 Draw Your Own Labubu
             </Link>
           </motion.div>
         )}

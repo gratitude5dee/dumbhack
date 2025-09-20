@@ -9,29 +9,29 @@ const Index = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmitFish = async (imageData: string, drawingData: any) => {
+  const handleSubmitLabubu = async (imageData: string, drawingData: any) => {
     setIsSubmitting(true);
     try {
       // Simulate AI classification for now (will be replaced with actual ONNX inference)
       const mockAiScore = Math.random() * 0.8 + 0.1; // Random score between 0.1-0.9
       const mockAiConfidence = Math.random() * 0.3 + 0.7; // Random confidence 0.7-1.0
 
-      const fish = await FishService.submitFish(
+      const labubu = await FishService.submitFish(
         imageData,
         drawingData,
         mockAiScore,
         mockAiConfidence
       );
 
-      if (fish) {
+      if (labubu) {
         toast({
-          title: "Fish submitted successfully!",
-          description: "Your fish is now swimming in the tank.",
+          title: "Labubu submitted successfully!",
+          description: "Your labubu is now displayed in the collection.",
         });
       } else {
         toast({
           title: "Error",
-          description: "Failed to submit your fish. Please try again.",
+          description: "Failed to submit your labubu. Please try again.",
           variant: "destructive",
         });
       }
@@ -58,14 +58,14 @@ const Index = () => {
               animate={{ opacity: 1, x: 0 }}
               className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"
             >
-              🐠 DrawAFish.com
+              🐰 DrawALabubu.com
             </motion.h1>
             <nav className="flex items-center gap-4">
               <Link 
                 to="/tank" 
                 className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
-                Tank
+                Collection
               </Link>
               <Link 
                 to="/rankings" 
@@ -89,13 +89,13 @@ const Index = () => {
             className="space-y-4"
           >
             <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Draw a Fish!
+              Draw a Labubu!
             </h1>
             <h2 className="text-xl md:text-2xl text-muted-foreground">
-              (facing right please)
+              (the cute plush character)
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Create your fish drawing and watch it swim in our community tank. 
+              Create your labubu drawing and display it in our community collection. 
               Our AI will analyze your drawing and other users can vote on your creation!
             </p>
           </motion.div>
@@ -108,7 +108,7 @@ const Index = () => {
             className="max-w-md mx-auto"
           >
             <DrawingCanvas
-              onSubmit={handleSubmitFish}
+              onSubmit={handleSubmitLabubu}
               aiEnabled={true}
               className="mb-8"
             />
@@ -122,7 +122,7 @@ const Index = () => {
               className="text-center space-y-2"
             >
               <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-              <p className="text-sm text-muted-foreground">Swimming your fish...</p>
+              <p className="text-sm text-muted-foreground">Adding your labubu...</p>
             </motion.div>
           )}
 
@@ -138,13 +138,13 @@ const Index = () => {
                 to="/tank"
                 className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
-                View Tank
+                View Collection
               </Link>
               <Link
                 to="/rankings"
                 className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-accent transition-colors"
               >
-                Vote on Fish
+                Vote on Labubus
               </Link>
             </div>
             <p className="text-sm text-muted-foreground">
