@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Eye, Calendar } from 'lucide-react';
+import { Heart, MessageCircle, Eye, Calendar, Trash2 } from 'lucide-react';
 import { Fish } from '@/types/fish';
 import { cn } from '@/lib/utils';
+import { useMasterUserStore } from '@/stores/masterUserStore';
+import { FishService } from '@/services/fishService';
+import { useToast } from '@/hooks/use-toast';
 
 interface LabubuCardProps {
   fish: Fish;
-  onVote?: (fishId: string, voteType: 'up' | 'down') => void;
+  onVote: (fishId: string, voteType: 'up' | 'down') => void;
+  onDelete?: (fishId: string) => void;
   showActions?: boolean;
   className?: string;
 }
 
-export const LabubuCard: React.FC<LabubuCardProps> = ({
-  fish,
-  onVote,
-  showActions = true,
-  className,
-}) => {
+export const LabubuCard: React.FC<LabubuCardProps> = ({ fish, onVote, onDelete, showActions = true, className }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
+  const { isMasterUser } = useMasterUserStore();
+  const { toast } = useToast();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -39,6 +40,25 @@ export const LabubuCard: React.FC<LabubuCardProps> = ({
     setHasVoted(true);
   };
 
+  const handleDelete = async () => {
+    if (!isMasterUser) return;
+    
+    const success = await FishService.deleteFish(fish.id);
+    if (success) {
+      toast({
+        title: 'Labubu Deleted',
+        description: 'The Labubu has been successfully removed.',
+      });
+      onDelete?.(fish.id);
+    } else {
+      toast({
+        title: 'Delete Failed',
+        description: 'Could not delete the Labubu. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -46,7 +66,7 @@ export const LabubuCard: React.FC<LabubuCardProps> = ({
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow',
+        'relative bg-card border border-border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow group',
         className
       )}
     >
@@ -112,39 +132,79 @@ export const LabubuCard: React.FC<LabubuCardProps> = ({
           </span>
         </div>
 
-        {/* Vote Actions */}
+        {/* Master User Proximity Indicator - Only visible on hover */}
+        {isMasterUser && fish.ai_score && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-purple-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg backdrop-blur-sm"
+            >
+              Similarity: {Math.round(fish.ai_score * 100)}%
+              {fish.ai_score < 0.3 && (
+                <span className="ml-1 text-red-200">⚠️ Can Delete</span>
+              )}
+            </motion.div>
+          </div>
+        )}
+
+        {/* Voting Actions - Only visible on hover */}
         {showActions && (
-          <div className="flex justify-center gap-2">
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1 }}
+              className="flex gap-3"
+            >
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => handleVote('up')}
               disabled={hasVoted}
               className={cn(
-                'p-2 rounded-full border transition-colors',
+                'p-2 rounded-full bg-white/95 border-2 transition-colors shadow-lg backdrop-blur-sm',
                 hasVoted
                   ? 'opacity-50 cursor-not-allowed'
                   : 'hover:bg-green-50 hover:border-green-500 hover:text-green-600'
               )}
             >
-              <Heart className="w-4 h-4" />
+              <Heart className="w-5 h-5" fill="currentColor" />
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleVote('down')}
-              disabled={hasVoted}
-              className={cn(
-                'p-2 rounded-full border transition-colors',
-                hasVoted
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'hover:bg-red-50 hover:border-red-500 hover:text-red-600'
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => handleVote('down')}
+                disabled={hasVoted}
+                className={cn(
+                  'p-2 rounded-full bg-white/95 border-2 transition-colors shadow-lg backdrop-blur-sm',
+                  hasVoted
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-red-50 hover:border-red-500 hover:text-red-600'
+                )}
+              >
+                <MessageCircle className="w-5 h-5 rotate-180" fill="currentColor" />
+              </motion.button>
+              {isMasterUser && (
+                <motion.button
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleDelete}
+                  disabled={fish.ai_score ? fish.ai_score >= 0.3 : false}
+                  className={cn(
+                    'p-2 rounded-full border-2 transition-colors shadow-lg backdrop-blur-sm',
+                    fish.ai_score && fish.ai_score >= 0.3
+                      ? 'bg-gray-400 text-gray-600 border-gray-400 cursor-not-allowed opacity-50'
+                      : 'bg-red-500 text-white border-red-500 hover:bg-red-600 hover:border-red-600'
+                  )}
+                  title={fish.ai_score && fish.ai_score >= 0.3 ? `Cannot delete: ${Math.round(fish.ai_score * 100)}% similarity too high` : 'Delete this drawing'}
+                >
+                  <Trash2 className="w-5 h-5" />
+                </motion.button>
               )}
-            >
-              <MessageCircle className="w-4 h-4 rotate-180" />
-            </motion.button>
-          </div>
-        )}
+              </motion.div>
+            </div>
+          )}
       </div>
     </motion.div>
   );

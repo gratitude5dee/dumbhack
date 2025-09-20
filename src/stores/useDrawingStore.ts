@@ -35,7 +35,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
   isDrawing: false,
   currentStroke: null,
   strokes: [],
-  canvasSize: { width: 400, height: 240 },
+  canvasSize: { width: 600, height: 400 },
   brushSize: 3,
   brushColor: '#000000',
   tool: 'pen',
