@@ -272,13 +272,10 @@ export default function Tank() {
       </main>
 
       {/* Master User Login Modal */}
-       {showMasterLogin && (
-         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-           <div className="max-w-md w-full">
-             <MasterUserLogin onClose={() => setShowMasterLogin(false)} />
-           </div>
-         </div>
-       )}
+      <MasterUserLogin 
+        isOpen={showMasterLogin} 
+        onClose={() => setShowMasterLogin(false)} 
+      />
     </div>
   );
 }

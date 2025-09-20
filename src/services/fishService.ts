@@ -220,6 +220,26 @@ export class FishService {
     }
   }
 
+  static async deleteFish(fishId: string): Promise<boolean> {
+    try {
+      // Soft delete by setting is_visible to false
+      const { error } = await supabase
+        .from('fish')
+        .update({ is_visible: false, updated_at: new Date().toISOString() })
+        .eq('id', fishId);
+
+      if (error) {
+        console.error('Error deleting fish:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in deleteFish:', error);
+      return false;
+    }
+  }
+
   static async getStats() {
     try {
       const { data: totalFish } = await supabase
