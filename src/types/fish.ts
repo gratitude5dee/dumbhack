@@ -17,6 +17,8 @@ export interface Fish {
   client_fingerprint?: string | null;
   drawing_duration?: number | null;
   canvas_dimensions?: any; // Using any to match Json type from Supabase
+  user_name?: string | null;
+  phone_number?: string | null;
   created_at: string;
   updated_at: string;
 }

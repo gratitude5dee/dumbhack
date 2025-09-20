@@ -57,10 +57,12 @@ export type Database = {
           is_approved: boolean | null
           is_fish: boolean | null
           is_visible: boolean | null
+          phone_number: string | null
           thumbnail_url: string | null
           updated_at: string | null
           upvotes: number | null
           user_id: string | null
+          user_name: string | null
           view_count: number | null
           vote_count: number | null
         }
@@ -79,10 +81,12 @@ export type Database = {
           is_approved?: boolean | null
           is_fish?: boolean | null
           is_visible?: boolean | null
+          phone_number?: string | null
           thumbnail_url?: string | null
           updated_at?: string | null
           upvotes?: number | null
           user_id?: string | null
+          user_name?: string | null
           view_count?: number | null
           vote_count?: number | null
         }
@@ -101,10 +105,12 @@ export type Database = {
           is_approved?: boolean | null
           is_fish?: boolean | null
           is_visible?: boolean | null
+          phone_number?: string | null
           thumbnail_url?: string | null
           updated_at?: string | null
           upvotes?: number | null
           user_id?: string | null
+          user_name?: string | null
           view_count?: number | null
           vote_count?: number | null
         }

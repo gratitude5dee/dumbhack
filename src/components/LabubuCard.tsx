@@ -115,7 +115,14 @@ export const LabubuCard: React.FC<LabubuCardProps> = ({ fish, onVote, onDelete, 
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
-            <span>{formatDate(fish.created_at)}</span>
+            <span>
+              {fish.user_name && (
+                <span className="font-medium text-foreground mr-2">
+                  {fish.user_name}
+                </span>
+              )}
+              {formatDate(fish.created_at)}
+            </span>
           </div>
         </div>
 

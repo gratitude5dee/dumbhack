@@ -6,6 +6,7 @@ export class FishService {
   static async submitFish(
     imageData: string,
     drawingData: any,
+    userData?: { name: string; phone: string },
     aiScore?: number,
     aiConfidence?: number
   ): Promise<Fish | null> {
@@ -48,6 +49,8 @@ export class FishService {
         client_fingerprint: fingerprint,
         drawing_duration: drawingData?.duration || 0,
         canvas_dimensions: drawingData?.dimensions || { width: 400, height: 240 },
+        user_name: userData?.name,
+        phone_number: userData?.phone,
       };
 
       const { data, error } = await supabase
