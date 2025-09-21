@@ -65,6 +65,18 @@ export class FishService {
       // Update anonymous session
       await this.updateAnonymousSession(fingerprint, 'fish_created');
 
+      // Create user submission record if userData provided
+      if (userData) {
+        await supabase
+          .from('user_submissions')
+          .insert({
+            user_name: userData.name,
+            phone_number: userData.phone,
+            client_fingerprint: fingerprint,
+            status: 'pending'
+          });
+      }
+
       return data as Fish;
     } catch (error) {
       console.error('Error submitting fish:', error);

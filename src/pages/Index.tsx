@@ -9,7 +9,11 @@ const Index = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmitLabubu = async (imageData: string, drawingData: any) => {
+  const handleSubmitLabubu = async (
+    imageData: string, 
+    drawingData: any, 
+    userData?: { name: string; phone: string }
+  ) => {
     setIsSubmitting(true);
     try {
       // Simulate AI classification for now (will be replaced with actual ONNX inference)
@@ -19,7 +23,7 @@ const Index = () => {
       const labubu = await FishService.submitFish(
         imageData,
         drawingData,
-        undefined,
+        userData,
         mockAiScore,
         mockAiConfidence
       );
