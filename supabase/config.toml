@@ -1,1 +1,7 @@
 project_id = "lwzrvgxqqyfhitgstdns"
+
+[functions.clear-submissions]
+verify_jwt = false
+
+[functions.clear-user-submission-fish]
+verify_jwt = false
