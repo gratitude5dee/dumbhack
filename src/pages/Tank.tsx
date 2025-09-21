@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Key } from 'lucide-react';
@@ -17,30 +17,137 @@ export default function Tank() {
   const { toast } = useToast();
   const { isMasterUser } = useMasterUserStore();
 
-  const loadFish = async (sort: SortOption = 'recent') => {
+  const loadFish = useCallback(async (sort: SortOption = 'recent') => {
     setLoading(true);
     try {
       const fishData = await FishService.getFish(50, 0, sort, 'all');
       setFish(fishData);
-      
+
       // Load stats
       const statsData = await FishService.getStats();
       setStats(statsData);
     } catch (error) {
       console.error('Error loading fish:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load labubus. Please try again.",
-          variant: "destructive",
-        });
+      toast({
+        title: 'Error',
+        description: 'Failed to load labubus. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     loadFish(sortBy);
-  }, [sortBy]);
+  }, [sortBy, loadFish]);
+
+  // Refs for DOM nodes and per-fish position/velocity state (percent-based)
+  const nodeRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+  const posRef = useRef<Record<string, { left: number; top: number; vx: number; vy: number; scale: number }>>({});
+
+  const seedHash = (str: string) => {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 16777619);
+    }
+    return Math.abs(h >>> 0);
+  };
+
+  const pseudoRandomFromSeed = (seed: number, n = 0) => {
+    const a = 1664525;
+    const c = 1013904223;
+    let value = (seed + n) >>> 0;
+    value = (Math.imul(a, value) + c) >>> 0;
+    return (value % 100000) / 100000;
+  };
+
+  // Initialize positions and velocities when fish list changes
+  useEffect(() => {
+    fish.forEach((f, i) => {
+      const seed = seedHash(f.id + String(i));
+      const r1 = pseudoRandomFromSeed(seed, 1);
+      const r2 = pseudoRandomFromSeed(seed, 2);
+      const left = 5 + r1 * 90; // percent
+      const top = 5 + r2 * 90; // percent
+
+      // velocities in percent-per-second (randomized)
+      const speedBase = 8 + pseudoRandomFromSeed(seed, 3) * 14; // percent/sec magnitude
+      const angle = pseudoRandomFromSeed(seed, 4) * Math.PI * 2;
+      const vx = Math.cos(angle) * speedBase;
+      const vy = Math.sin(angle) * (speedBase * (0.6 + pseudoRandomFromSeed(seed, 5) * 0.8));
+
+      // scale for subtle size differences
+      const scale = 0.9 + pseudoRandomFromSeed(seed, 6) * 0.4;
+
+      // If already tracked, keep current pos/vel; otherwise initialize
+      if (!posRef.current[f.id]) {
+        posRef.current[f.id] = { left, top, vx, vy, scale };
+      } else {
+        // preserve current left/top but update velocity slightly
+        posRef.current[f.id].vx = vx;
+        posRef.current[f.id].vy = vy;
+        posRef.current[f.id].scale = scale;
+      }
+    });
+  }, [fish]);
+
+  // RAF loop to update positions and write to DOM directly for smooth motion
+  useEffect(() => {
+    let rafId: number | null = null;
+    let last = performance.now();
+
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000); // clamp delta to avoid big jumps
+      last = now;
+
+      const entries = Object.entries(posRef.current);
+      for (const [id, state] of entries) {
+        let { left, top, vx, vy } = state;
+
+        left += vx * dt;
+        top += vy * dt;
+
+        // Bounce off percent boundaries (5% - 95%) to keep cards visible
+        if (left <= 3) {
+          left = 3;
+          vx = Math.abs(vx) * (0.7 + Math.random() * 0.6);
+        } else if (left >= 97) {
+          left = 97;
+          vx = -Math.abs(vx) * (0.7 + Math.random() * 0.6);
+        }
+
+        if (top <= 3) {
+          top = 3;
+          vy = Math.abs(vy) * (0.7 + Math.random() * 0.6);
+        } else if (top >= 97) {
+          top = 97;
+          vy = -Math.abs(vy) * (0.7 + Math.random() * 0.6);
+        }
+
+        // write back
+        state.left = left;
+        state.top = top;
+        state.vx = vx;
+        state.vy = vy;
+
+        const node = nodeRefs.current.get(id);
+        if (node) {
+          node.style.left = `${left}%`;
+          node.style.top = `${top}%`;
+          // keep centering transform on parent so framer-motion inside won't overwrite it
+        }
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    if (fish.length > 0) rafId = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [fish]);
 
   const handleVote = async (fishId: string, voteType: 'up' | 'down') => {
     try {
@@ -174,85 +281,22 @@ export default function Tank() {
             </div>
 
             <AnimatePresence>
-              {fish.map((fishItem, index) => {
-                // Deterministic pseudo-random function based on fish ID
-                const seedHash = (str: string) => {
-                  let hash = 0;
-                  for (let i = 0; i < str.length; i++) {
-                    const char = str.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash; // Convert to 32-bit integer
-                  }
-                  return Math.abs(hash);
-                };
-                
-                const seed = seedHash(fishItem.id + index.toString());
-                const pseudoRandom = (offset = 0) => ((seed + offset) * 9301 + 49297) % 233280 / 233280;
-                
-                // Enhanced distribution algorithm for better spacing
-                const goldenRatio = (1 + Math.sqrt(5)) / 2;
-                const angle = index * 2 * Math.PI / goldenRatio;
-                const maxRadius = Math.min(35, 8 + index * 1.5); // More gradual spiral
-                const radius = Math.sqrt(index + 1) * (maxRadius / 8);
-                
-                // Convert polar to cartesian with better bounds
-                let baseX = 50 + (radius * Math.cos(angle));
-                let baseY = 50 + (radius * Math.sin(angle));
-                
-                // Add deterministic offset to prevent perfect grid
-                const offsetX = (pseudoRandom(1) - 0.5) * 20;
-                const offsetY = (pseudoRandom(2) - 0.5) * 20;
-                
-                const finalX = Math.max(8, Math.min(88, baseX + offsetX));
-                const finalY = Math.max(8, Math.min(88, baseY + offsetY));
-                
-                // Deterministic floating parameters
-                const floatDuration = 18 + pseudoRandom(3) * 25; // 18-43 seconds
-                const floatDelay = (index * 0.3) + pseudoRandom(4) * 3; // Staggered start
-                
-                // Deterministic floating paths
-                const pathVariationX = 6 + pseudoRandom(5) * 12; // 6-18% movement
-                const pathVariationY = 4 + pseudoRandom(6) * 10; // 4-14% movement
-                
+              {fish.map((fishItem) => {
+                const id = fishItem.id;
+
                 return (
-                  <motion.div
-                    key={fishItem.id}
-                    initial={{ 
-                      opacity: 0, 
-                      x: `${finalX}%`, 
-                      y: `${finalY}%`,
-                      scale: 0.8
-                    }}
-                    animate={{ 
-                      opacity: 1,
-                      x: [
-                        `${finalX}%`, 
-                        `${Math.max(5, Math.min(90, finalX + pathVariationX))}%`,
-                        `${Math.max(5, Math.min(90, finalX - pathVariationX/2))}%`,
-                        `${finalX}%`
-                      ],
-                      y: [
-                        `${finalY}%`, 
-                        `${Math.max(5, Math.min(90, finalY + pathVariationY))}%`,
-                        `${Math.max(5, Math.min(90, finalY - pathVariationY/2))}%`,
-                        `${finalY}%`
-                      ],
-                      scale: [1, 1.05, 0.95, 1]
-                    }}
-                    transition={{ 
-                      duration: floatDuration,
-                      delay: floatDelay,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                    className="absolute"
+                  <div
+                    key={id}
+                    ref={(el) => nodeRefs.current.set(id, el)}
+                    // initial placement will be driven by RAF loop; fallback to center
+                    style={{ position: 'absolute', left: `${posRef.current[id]?.left ?? 50}%`, top: `${posRef.current[id]?.top ?? 50}%`, transform: 'translate(-50%, -50%)' }}
                   >
                     <FloatingLabubuCard
                       fish={fishItem}
                       onVote={handleVote}
                       onDelete={isMasterUser ? handleDelete : undefined}
                     />
-                  </motion.div>
+                  </div>
                 );
               })}
             </AnimatePresence>
