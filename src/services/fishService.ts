@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Fish, Vote, SortOption, FilterOption } from '@/types/fish';
+import { Fish, UserSubmission, SortOption, FilterOption } from '@/types/fish';
 import { getOrCreateFingerprint } from '@/lib/fingerprint';
 
 export class FishService {
@@ -39,6 +39,27 @@ export class FishService {
         .from('fish-images')
         .getPublicUrl(fileName);
 
+      let submissionId = null;
+
+      // Create user submission record if userData provided
+      if (userData && (userData.name || userData.phone)) {
+        const { data: submission, error: submissionError } = await supabase
+          .from('user_submissions')
+          .insert([{
+            user_name: userData.name || null,
+            phone_number: userData.phone || null,
+            client_fingerprint: fingerprint,
+          }])
+          .select()
+          .single();
+
+        if (submissionError) {
+          console.error('Error creating user submission:', submissionError);
+        } else {
+          submissionId = submission.id;
+        }
+      }
+
       // Create fish record
       const fishData = {
         image_url: publicUrl,
@@ -49,8 +70,7 @@ export class FishService {
         client_fingerprint: fingerprint,
         drawing_duration: drawingData?.duration || 0,
         canvas_dimensions: drawingData?.dimensions || { width: 400, height: 240 },
-        user_name: userData?.name,
-        phone_number: userData?.phone,
+        submission_id: submissionId,
       };
 
       const { data, error } = await supabase

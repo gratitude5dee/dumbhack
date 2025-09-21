@@ -17,8 +17,16 @@ export interface Fish {
   client_fingerprint?: string | null;
   drawing_duration?: number | null;
   canvas_dimensions?: any; // Using any to match Json type from Supabase
+  submission_id?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserSubmission {
+  id: string;
   user_name?: string | null;
   phone_number?: string | null;
+  client_fingerprint?: string | null;
   created_at: string;
   updated_at: string;
 }

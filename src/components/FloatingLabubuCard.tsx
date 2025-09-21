@@ -95,7 +95,7 @@ export const FloatingLabubuCard: React.FC<FloatingLabubuCardProps> = ({
         >
           <img
             src={fish.thumbnail_url || fish.image_url}
-            alt={`Labubu by ${fish.user_name || 'Anonymous'}`}
+            alt={`Labubu by Anonymous`}
             className="w-full h-full object-contain p-1"
             onLoad={() => setImageLoaded(true)}
             loading="lazy"
@@ -143,11 +143,9 @@ export const FloatingLabubuCard: React.FC<FloatingLabubuCardProps> = ({
               
               {/* Content */}
               <div className="space-y-1.5">
-                {fish.user_name && (
-                  <div className="font-semibold text-blue-200">
-                    By {fish.user_name}
-                  </div>
-                )}
+                <div className="font-semibold text-blue-200">
+                  Anonymous Labubu
+                </div>
                 
                 <div className="flex items-center gap-3 text-gray-300">
                   <div className="flex items-center gap-1">
