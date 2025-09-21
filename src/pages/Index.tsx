@@ -4,12 +4,9 @@ import { Link } from 'react-router-dom';
 import { DrawingCanvas } from '@/components/DrawingCanvas';
 import { FishService } from '@/services/fishService';
 import { useToast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 
 const Index = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isMobile = useIsMobile();
   const { toast } = useToast();
 
   const handleSubmitLabubu = async (
@@ -57,15 +54,44 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      {/* Header */}
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <motion.h1 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent"
+            >
+              🐰 DrawALabubu.com
+            </motion.h1>
+            <nav className="flex items-center gap-4">
+              <Link 
+                to="/tank" 
+                className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Collection
+              </Link>
+              <Link 
+                to="/store" 
+                className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Store
+              </Link>
+              <Link 
+                to="/rankings" 
+                className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Rankings
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       {/* Main Content */}
-      <main className={cn(
-        "max-w-4xl mx-auto px-4 py-12",
-        isMobile && "px-3 py-6"
-      )}>
-        <div className={cn(
-          "text-center space-y-8",
-          isMobile && "space-y-6"
-        )}>
+      <main className="max-w-4xl mx-auto px-4 py-12">
+        <div className="text-center space-y-8">
           {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -73,22 +99,13 @@ const Index = () => {
             transition={{ delay: 0.1 }}
             className="space-y-4"
           >
-            <h1 className={cn(
-              "font-bold text-foreground",
-              isMobile ? "text-3xl" : "text-4xl md:text-5xl"
-            )}>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
               Draw a Labubu!
             </h1>
-            <h2 className={cn(
-              "text-muted-foreground",
-              isMobile ? "text-lg" : "text-xl md:text-2xl"
-            )}>
+            <h2 className="text-xl md:text-2xl text-muted-foreground">
               (the cute plush character)
             </h2>
-            <p className={cn(
-              "text-muted-foreground max-w-2xl mx-auto leading-relaxed",
-              isMobile ? "text-sm px-4" : "text-lg"
-            )}>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Create your labubu drawing and display it in our community collection. 
               Our AI will analyze your drawing and other users can vote on your creation!
             </p>
@@ -127,33 +144,21 @@ const Index = () => {
             transition={{ delay: 0.3 }}
             className="space-y-4"
           >
-            <div className={cn(
-              "flex justify-center gap-4",
-              isMobile && "flex-col items-center gap-3 px-4"
-            )}>
+            <div className="flex justify-center gap-4">
               <Link
                 to="/tank"
-                className={cn(
-                  "px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors",
-                  isMobile && "w-full max-w-xs min-h-[48px] flex items-center justify-center"
-                )}
+                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
               >
                 View Collection
               </Link>
               <Link
                 to="/rankings"
-                className={cn(
-                  "px-6 py-3 border border-border rounded-lg font-medium hover:bg-accent transition-colors",
-                  isMobile && "w-full max-w-xs min-h-[48px] flex items-center justify-center"
-                )}
+                className="px-6 py-3 border border-border rounded-lg font-medium hover:bg-accent transition-colors"
               >
                 Vote on Labubus
               </Link>
             </div>
-            <p className={cn(
-              "text-muted-foreground",
-              isMobile ? "text-xs" : "text-sm"
-            )}>
+            <p className="text-sm text-muted-foreground">
               No account required • Anonymous drawing • Community voting
             </p>
           </motion.div>

@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useDrawingStore } from '@/stores/useDrawingStore';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { SubmissionModal } from './SubmissionModal';
 
 
@@ -18,13 +17,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   aiEnabled = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dprRef = useRef<number>(1); // Store DPR for coordinate scaling
   const [isDrawing, setIsDrawing] = useState(false);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string>('');
-  const [lastTouchTime, setLastTouchTime] = useState(0);
-  const isMobile = useIsMobile();
   
   const {
     strokes,
@@ -44,49 +40,23 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     setCanvasSize,
   } = useDrawingStore();
 
-  // Set up canvas with mobile-optimized sizing
+  // Set up canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const updateCanvasSize = () => {
-      const rect = canvas.getBoundingClientRect();
-      const aspectRatio = isMobile ? 16 / 10 : 5 / 3; // Mobile gets 16:10, desktop 5:3
-      
-      // Adaptive canvas sizing based on screen size
-      const maxWidth = isMobile ? Math.min(window.innerWidth - 32, 350) : 400;
-      const width = Math.min(rect.width, maxWidth);
-      const height = width / aspectRatio;
-      
-      setCanvasSize(width, height);
+    const rect = canvas.getBoundingClientRect();
+    setCanvasSize(rect.width, rect.height);
 
-      // Enhanced high DPI support for mobile screens
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2); // Limit to 2x for performance
-        dprRef.current = dpr; // Store DPR for coordinate calculations
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
-        ctx.scale(dpr, dpr);
-        
-        // Mobile-optimized rendering settings
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.imageSmoothingEnabled = true;
-      }
-    };
-
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize);
-    window.addEventListener('orientationchange', updateCanvasSize);
-    
-    return () => {
-      window.removeEventListener('resize', updateCanvasSize);
-      window.removeEventListener('orientationchange', updateCanvasSize);
-    };
-  }, [setCanvasSize, isMobile]);
+    // Set up high DPI support
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+  }, [setCanvasSize]);
 
   // Render strokes
   useEffect(() => {
@@ -169,69 +139,39 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     finishStroke();
   };
 
-  // Enhanced touch handling with palm rejection and pressure sensitivity
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
-    e.stopPropagation();
-    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const now = Date.now();
-    
-    // Simple palm rejection: ignore very large touch areas or rapid successive touches
-    const touch = e.touches[0];
-    const touchSize = (touch as any).radiusX || 0;
-    if (touchSize > 20 || (now - lastTouchTime < 10)) return;
-    
-    setLastTouchTime(now);
-
     const rect = canvas.getBoundingClientRect();
-    // Convert touch coordinates to canvas coordinates (no DPR scaling needed - context handles it)
+    const touch = e.touches[0];
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-    
-    // Pressure sensitivity for supported devices
-    const pressure = (touch as any).force || 1;
 
     setIsDrawing(true);
     startDrawing();
-    addPoint(x, y, pressure);
-    
-    // Haptic feedback on supported devices
-    if ('vibrate' in navigator) {
-      navigator.vibrate(1);
-    }
+    addPoint(x, y);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
-    e.stopPropagation();
-    
-    if (!isDrawing || e.touches.length !== 1) return;
+    if (!isDrawing) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    // Convert touch coordinates to canvas coordinates (no DPR scaling needed - context handles it)
+    const touch = e.touches[0];
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-    
-    const pressure = (touch as any).force || 1;
-    addPoint(x, y, pressure);
+
+    addPoint(x, y);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     e.preventDefault();
-    e.stopPropagation();
-    
-    if (isDrawing) {
-      setIsDrawing(false);
-      stopDrawing();
-      finishStroke();
-    }
+    handleMouseUp();
   };
 
   const handleSubmit = useCallback(() => {
@@ -298,11 +238,11 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       >
         <canvas
           ref={canvasRef}
+          width={400}
+          height={240}
           className={cn(
-            'border-2 rounded-lg bg-white select-none',
-            'shadow-sm hover:shadow-md transition-all duration-200',
-            'touch-none', // Prevents default touch behaviors
-            isMobile ? 'cursor-none' : 'cursor-crosshair',
+            'border-2 rounded-lg bg-white cursor-crosshair select-none',
+            'shadow-sm hover:shadow-md transition-shadow',
             getAiFeedbackColor()
           )}
           onMouseDown={handleMouseDown}
@@ -312,29 +252,20 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          onContextMenu={(e) => e.preventDefault()} // Prevent context menu
           style={{
             width: '100%',
-            maxWidth: isMobile ? '350px' : '400px',
+            maxWidth: '400px',
             height: 'auto',
-            aspectRatio: isMobile ? '16/10' : '5/3',
-            touchAction: 'none', // Critical for preventing scroll while drawing
+            aspectRatio: '400/240',
           }}
         />
       </motion.div>
 
-      {/* Mobile-optimized Controls */}
-      <div className={cn(
-        "flex justify-center gap-2 flex-wrap",
-        isMobile && "gap-3"
-      )}>
+      {/* Controls */}
+      <div className="flex justify-center gap-2">
         <button
           onClick={clearCanvas}
-          className={cn(
-            "px-4 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors",
-            "active:scale-95", // Touch feedback
-            isMobile && "min-h-[44px] px-6 text-base" // Larger touch targets for mobile
-          )}
+          className="px-4 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors"
         >
           Clear
         </button>
@@ -342,13 +273,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
           <button
             onClick={handleSubmit}
             disabled={strokes.length === 0 || isSubmitting}
-            className={cn(
-              "px-6 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all",
-              "active:scale-95", // Touch feedback
-              isMobile && "min-h-[44px] px-8 text-base font-medium" // Larger for mobile
-            )}
+            className="px-6 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isMobile ? "Add!" : "Add to collection!"}
+            Add to collection!
           </button>
         )}
       </div>

@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 
 interface SubmissionModalProps {
   isOpen: boolean;
@@ -24,7 +22,6 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,17 +40,12 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={cn(
-        "sm:max-w-md",
-        isMobile && "w-[95vw] max-w-[95vw] rounded-t-xl rounded-b-none fixed bottom-0 top-auto transform-none"
-      )}>
-        <DialogHeader className={isMobile ? "text-center pb-2" : ""}>
-          <DialogTitle className="text-center text-lg font-semibold">
-            Share Your Labubu!
-          </DialogTitle>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-center">Share Your Labubu!</DialogTitle>
         </DialogHeader>
         
-        <div className={cn("space-y-4", isMobile && "space-y-6")}>
+        <div className="space-y-6">
           {imagePreview && (
             <motion.div 
               className="flex justify-center"
@@ -61,10 +53,7 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className={cn(
-                "border-2 border-primary/20 rounded-lg overflow-hidden bg-muted",
-                isMobile ? "w-56 h-36" : "w-48 h-32"
-              )}>
+              <div className="w-48 h-32 border-2 border-primary/20 rounded-lg overflow-hidden bg-muted">
                 <img 
                   src={imagePreview} 
                   alt="Your Labubu drawing" 
@@ -74,11 +63,9 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
             </motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className={cn("space-y-4", isMobile && "space-y-5")}>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className={isMobile ? "text-base font-medium" : ""}>
-                Your Name *
-              </Label>
+              <Label htmlFor="name">Your Name *</Label>
               <Input
                 id="name"
                 type="text"
@@ -87,17 +74,12 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
                 placeholder="Enter your name"
                 required
                 disabled={isSubmitting}
-                className={cn(
-                  "transition-all",
-                  isMobile && "h-12 text-base"
-                )}
+                className="transition-all"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className={isMobile ? "text-base font-medium" : ""}>
-                Phone Number *
-              </Label>
+              <Label htmlFor="phone">Phone Number *</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -106,36 +88,24 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
                 placeholder="Enter your phone number"
                 required
                 disabled={isSubmitting}
-                className={cn(
-                  "transition-all",
-                  isMobile && "h-12 text-base"
-                )}
+                className="transition-all"
               />
             </div>
 
-            <div className={cn(
-              "flex gap-3 pt-4",
-              isMobile && "pt-6 gap-4"
-            )}>
+            <div className="flex gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className={cn(
-                  "flex-1",
-                  isMobile && "h-12 text-base font-medium"
-                )}
+                className="flex-1"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={!name.trim() || !phone.trim() || isSubmitting}
-                className={cn(
-                  "flex-1",
-                  isMobile && "h-12 text-base font-medium"
-                )}
+                className="flex-1"
               >
                 {isSubmitting ? (
                   <motion.div
@@ -144,7 +114,7 @@ export const SubmissionModal: React.FC<SubmissionModalProps> = ({
                     className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
                   />
                 ) : (
-                  isMobile ? 'Add!' : 'Add to Collection!'
+                  'Add to Collection!'
                 )}
               </Button>
             </div>

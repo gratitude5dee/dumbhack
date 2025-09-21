@@ -64,7 +64,7 @@ export const useDrawingStore = create<DrawingState>((set, get) => ({
       const newStroke: Stroke = {
         points: [{ x, y, pressure }],
         color: state.brushColor,
-        width: state.brushSize * Math.max(0.5, pressure), // Pressure affects width
+        width: state.brushSize,
         tool: state.tool,
         timestamp: Date.now(),
       };
