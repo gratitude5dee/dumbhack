@@ -272,6 +272,23 @@ export default function Tank() {
           </div>
         )}
 
+        {/* Draw Your Own Labubu button moved below tank */}
+        {fish.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-center mt-8"
+          >
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            >
+              🎨 Draw Your Own Labubu
+            </Link>
+          </motion.div>
+        )}
+
         {/* Empty State */}
         {!loading && fish.length === 0 && (
           <motion.div
@@ -289,23 +306,6 @@ export default function Tank() {
               className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
             >
               Draw Your First Labubu
-            </Link>
-          </motion.div>
-        )}
-
-        {/* Call to Action */}
-        {fish.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-center mt-12 pt-8 border-t border-border"
-          >
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-            >
-              🎨 Draw Your Own Labubu
             </Link>
           </motion.div>
         )}
