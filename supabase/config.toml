@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.clear-user-submission-fish]
 verify_jwt = false
+
+[functions.clear-all-fish-images]
+verify_jwt = false

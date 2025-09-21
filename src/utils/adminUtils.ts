@@ -21,13 +21,34 @@ export class AdminUtils {
       throw error;
     }
   }
+
+  static async clearAllFishImages(): Promise<void> {
+    try {
+      console.log('Triggering cleanup of all fish images and thumbnails...');
+      
+      const { data, error } = await supabase.functions.invoke('clear-all-fish-images', {
+        body: {}
+      });
+
+      if (error) {
+        console.error('Error clearing fish images:', error);
+        throw error;
+      }
+
+      console.log('Image cleanup completed successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Failed to clear fish images:', error);
+      throw error;
+    }
+  }
 }
 
-// Immediately trigger the cleanup
-AdminUtils.clearUserSubmissionFish()
+// Immediately trigger the image cleanup
+AdminUtils.clearAllFishImages()
   .then(result => {
-    console.log('✅ User submission fish cleanup completed:', result);
+    console.log('✅ Fish images and thumbnails cleanup completed:', result);
   })
   .catch(error => {
-    console.error('❌ User submission fish cleanup failed:', error);
+    console.error('❌ Fish images and thumbnails cleanup failed:', error);
   });
