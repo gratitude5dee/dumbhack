@@ -57,12 +57,11 @@ export type Database = {
           is_approved: boolean | null
           is_fish: boolean | null
           is_visible: boolean | null
-          phone_number: string | null
+          submission_id: string | null
           thumbnail_url: string | null
           updated_at: string | null
           upvotes: number | null
           user_id: string | null
-          user_name: string | null
           view_count: number | null
           vote_count: number | null
         }
@@ -81,12 +80,11 @@ export type Database = {
           is_approved?: boolean | null
           is_fish?: boolean | null
           is_visible?: boolean | null
-          phone_number?: string | null
+          submission_id?: string | null
           thumbnail_url?: string | null
           updated_at?: string | null
           upvotes?: number | null
           user_id?: string | null
-          user_name?: string | null
           view_count?: number | null
           vote_count?: number | null
         }
@@ -105,14 +103,63 @@ export type Database = {
           is_approved?: boolean | null
           is_fish?: boolean | null
           is_visible?: boolean | null
-          phone_number?: string | null
+          submission_id?: string | null
           thumbnail_url?: string | null
           updated_at?: string | null
           upvotes?: number | null
           user_id?: string | null
-          user_name?: string | null
           view_count?: number | null
           vote_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fish_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "user_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_submissions: {
+        Row: {
+          assistant_overrides: Json | null
+          call_number: string | null
+          client_fingerprint: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          phone_number: string | null
+          priority: number | null
+          status: string | null
+          updated_at: string | null
+          user_name: string | null
+        }
+        Insert: {
+          assistant_overrides?: Json | null
+          call_number?: string | null
+          client_fingerprint?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          phone_number?: string | null
+          priority?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          assistant_overrides?: Json | null
+          call_number?: string | null
+          client_fingerprint?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          phone_number?: string | null
+          priority?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
@@ -156,7 +203,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_all_user_submissions: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
