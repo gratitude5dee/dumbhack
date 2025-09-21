@@ -209,6 +209,9 @@ const Storefront = () => {
                         }, 4000);
                       }, 3000);
                     }}>
+                            Play Now
+                          </Button>
+                          <Button onClick={() => window.open('https://buy.stripe.com/00wbJ2gBBepq1iV0Xa8og04', '_blank')}>
                             Buy Now
                           </Button>
                           <Button variant="ghost" className="ml-2" onClick={() => setOpenDialogId(null)}>Close</Button>
