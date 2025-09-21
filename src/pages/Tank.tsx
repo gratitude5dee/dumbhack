@@ -267,7 +267,6 @@ export default function Tank() {
             
             {/* Subtle water ripple effects */}
             <div className="absolute top-0 left-0 w-full h-full">
-              <div className="absolute top-1/4 left-1/3 w-32 h-1 bg-white/10 rounded-full blur-sm animate-pulse"></div>
               <div className="absolute top-2/3 right-1/4 w-24 h-1 bg-white/10 rounded-full blur-sm animate-pulse delay-1000"></div>
             </div>
           </div>
@@ -311,6 +310,9 @@ export default function Tank() {
           </motion.div>
         )}
       </main>
+
+      {/* Moved decorative element below tank */}
+      <div className="w-32 h-1 bg-white/10 rounded-full blur-sm animate-pulse mx-auto mt-4"></div>
 
       {/* Master User Login Modal */}
       <MasterUserLogin 
