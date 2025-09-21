@@ -19,6 +19,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   aiEnabled = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dprRef = useRef<number>(1); // Store DPR for coordinate scaling
   const [isDrawing, setIsDrawing] = useState(false);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +65,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       const ctx = canvas.getContext('2d');
       if (ctx) {
         const dpr = Math.min(window.devicePixelRatio || 1, 2); // Limit to 2x for performance
+        dprRef.current = dpr; // Store DPR for coordinate calculations
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         canvas.style.width = `${width}px`;
@@ -186,6 +188,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     setLastTouchTime(now);
 
     const rect = canvas.getBoundingClientRect();
+    // Convert touch coordinates to canvas coordinates (no DPR scaling needed - context handles it)
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
     
@@ -213,6 +216,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
+    // Convert touch coordinates to canvas coordinates (no DPR scaling needed - context handles it)
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
     
