@@ -42,13 +42,34 @@ export class AdminUtils {
       throw error;
     }
   }
+
+  static async clearAllSubmissions(): Promise<void> {
+    try {
+      console.log('Triggering cleanup of all user submissions...');
+      
+      const { data, error } = await supabase.functions.invoke('clear-submissions', {
+        body: {}
+      });
+
+      if (error) {
+        console.error('Error clearing submissions:', error);
+        throw error;
+      }
+
+      console.log('Submissions cleanup completed successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Failed to clear submissions:', error);
+      throw error;
+    }
+  }
 }
 
-// Immediately trigger the image cleanup again
-AdminUtils.clearAllFishImages()
+// Clear all submissions to start fresh
+AdminUtils.clearAllSubmissions()
   .then(result => {
-    console.log('✅ Fish images and thumbnails cleanup completed:', result);
+    console.log('✅ All submissions cleared - starting fresh:', result);
   })
   .catch(error => {
-    console.error('❌ Fish images and thumbnails cleanup failed:', error);
+    console.error('❌ Failed to clear submissions:', error);
   });
