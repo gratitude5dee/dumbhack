@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+LABUBU Mass Caller (Vapi x ElevenLabs Dumb Hackathon)
 
 ## Project info
 
