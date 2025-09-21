@@ -78,7 +78,7 @@ export const HackathonModal: React.FC<HackathonModalProps> = ({ isOpen, onClose 
               </div>
               <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-semibold text-slate-600">📍 Location</span>
-                <span className="text-sm font-bold text-slate-900">LABUBU</span>
+                <span className="text-sm font-bold text-slate-900">Pebblebed</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm font-semibold text-slate-600">🎯 Theme</span>
