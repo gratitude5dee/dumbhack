@@ -4,7 +4,6 @@ import { useDrawingStore } from '@/stores/useDrawingStore';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SubmissionModal } from './SubmissionModal';
-import { MobileDrawingToolbar } from './MobileDrawingToolbar';
 
 
 interface DrawingCanvasProps {
@@ -361,8 +360,6 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         isSubmitting={isSubmitting}
         imagePreview={capturedImage}
       />
-      
-      <MobileDrawingToolbar />
     </div>
   );
 };
