@@ -24,9 +24,14 @@ export interface Fish {
 
 export interface UserSubmission {
   id: string;
-  user_name?: string | null;
-  phone_number?: string | null;
+  user_name?: string | null; // Optional name column
+  phone_number?: string | null; // Primary number to call
+  call_number?: string | null; // Alternative number to call
   client_fingerprint?: string | null;
+  assistant_overrides?: any; // JSON object for assistant configuration
+  priority?: number; // Call priority (1-5)
+  status?: string; // Submission status
+  notes?: string; // Additional notes
   created_at: string;
   updated_at: string;
 }

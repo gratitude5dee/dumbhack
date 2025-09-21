@@ -123,26 +123,41 @@ export type Database = {
       }
       user_submissions: {
         Row: {
+          assistant_overrides: Json | null
+          call_number: string | null
           client_fingerprint: string | null
           created_at: string | null
           id: string
+          notes: string | null
           phone_number: string | null
+          priority: number | null
+          status: string | null
           updated_at: string | null
           user_name: string | null
         }
         Insert: {
+          assistant_overrides?: Json | null
+          call_number?: string | null
           client_fingerprint?: string | null
           created_at?: string | null
           id?: string
+          notes?: string | null
           phone_number?: string | null
+          priority?: number | null
+          status?: string | null
           updated_at?: string | null
           user_name?: string | null
         }
         Update: {
+          assistant_overrides?: Json | null
+          call_number?: string | null
           client_fingerprint?: string | null
           created_at?: string | null
           id?: string
+          notes?: string | null
           phone_number?: string | null
+          priority?: number | null
+          status?: string | null
           updated_at?: string | null
           user_name?: string | null
         }
