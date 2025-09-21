@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { DrawingCanvas } from '@/components/DrawingCanvas';
+import { HackathonModal } from '@/components/HackathonModal';
 import { FishService } from '@/services/fishService';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showHackathonModal, setShowHackathonModal] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Show modal after a short delay when page loads
+    const timer = setTimeout(() => {
+      setShowHackathonModal(true);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmitLabubu = async (imageData: string, drawingData: any, userData?: { name: string; phone: string }) => {
     setIsSubmitting(true);
@@ -160,6 +171,12 @@ const Index = () => {
           </motion.div>
         </div>
       </main>
+      
+      {/* Hackathon Modal */}
+      <HackathonModal 
+        isOpen={showHackathonModal} 
+        onClose={() => setShowHackathonModal(false)} 
+      />
     </div>
   );
 };
