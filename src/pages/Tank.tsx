@@ -175,48 +175,50 @@ export default function Tank() {
 
             <AnimatePresence>
               {fish.map((fishItem, index) => {
+                // Simple grid-based distribution with random offset for better spread
+                const gridSize = Math.ceil(Math.sqrt(fish.length));
+                const row = Math.floor(index / gridSize);
+                const col = index % gridSize;
+                
                 // Deterministic pseudo-random function based on fish ID
                 const seedHash = (str: string) => {
                   let hash = 0;
                   for (let i = 0; i < str.length; i++) {
                     const char = str.charCodeAt(i);
                     hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash; // Convert to 32-bit integer
+                    hash = hash & hash;
                   }
                   return Math.abs(hash);
                 };
                 
-                const seed = seedHash(fishItem.id + index.toString());
+                const seed = seedHash(fishItem.id);
                 const pseudoRandom = (offset = 0) => ((seed + offset) * 9301 + 49297) % 233280 / 233280;
                 
-                // Enhanced distribution algorithm for better spacing
-                const goldenRatio = (1 + Math.sqrt(5)) / 2;
-                const angle = index * 2 * Math.PI / goldenRatio;
-                const maxRadius = Math.min(35, 8 + index * 1.5); // More gradual spiral
-                const radius = Math.sqrt(index + 1) * (maxRadius / 8);
+                // Calculate position based on grid with random offset
+                const gridSpacingX = 80 / Math.max(1, gridSize - 1);
+                const gridSpacingY = 80 / Math.max(1, gridSize - 1);
                 
-                // Convert polar to cartesian with better bounds
-                let baseX = 50 + (radius * Math.cos(angle));
-                let baseY = 50 + (radius * Math.sin(angle));
+                const baseX = 10 + (col * gridSpacingX) + (pseudoRandom(1) - 0.5) * 15;
+                const baseY = 10 + (row * gridSpacingY) + (pseudoRandom(2) - 0.5) * 15;
                 
-                // Add deterministic offset to prevent perfect grid
-                const offsetX = (pseudoRandom(1) - 0.5) * 20;
-                const offsetY = (pseudoRandom(2) - 0.5) * 20;
-                
-                const finalX = Math.max(8, Math.min(88, baseX + offsetX));
-                const finalY = Math.max(8, Math.min(88, baseY + offsetY));
+                const finalX = Math.max(5, Math.min(90, baseX));
+                const finalY = Math.max(5, Math.min(90, baseY));
                 
                 // Deterministic floating parameters
-                const floatDuration = 18 + pseudoRandom(3) * 25; // 18-43 seconds
-                const floatDelay = (index * 0.3) + pseudoRandom(4) * 3; // Staggered start
+                const floatDuration = 20 + pseudoRandom(3) * 25;
+                const floatDelay = (index * 0.2) + pseudoRandom(4) * 2;
                 
-                // Deterministic floating paths
-                const pathVariationX = 6 + pseudoRandom(5) * 12; // 6-18% movement
-                const pathVariationY = 4 + pseudoRandom(6) * 10; // 4-14% movement
+                // Deterministic floating paths for animation
+                const pathVariationX = 8 + pseudoRandom(5) * 12;
+                const pathVariationY = 6 + pseudoRandom(6) * 10;
                 
                 return (
                   <motion.div
                     key={fishItem.id}
+                    drag
+                    dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                    dragElastic={0.2}
+                    whileDrag={{ scale: 1.1, zIndex: 100 }}
                     initial={{ 
                       opacity: 0, 
                       x: `${finalX}%`, 
