@@ -51,35 +51,30 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
     const updateCanvasSize = () => {
       const rect = canvas.getBoundingClientRect();
-      const aspectRatio = isMobile ? 4 / 3 : 3 / 2; // Better aspect ratios for drawing
+      const aspectRatio = isMobile ? 16 / 10 : 5 / 3; // Mobile gets 16:10, desktop 5:3
       
-      // Increased canvas sizing for better drawing experience
-      const maxWidth = isMobile ? Math.min(window.innerWidth - 24, 420) : 600;
+      // Adaptive canvas sizing based on screen size
+      const maxWidth = isMobile ? Math.min(window.innerWidth - 32, 350) : 400;
       const width = Math.min(rect.width, maxWidth);
       const height = width / aspectRatio;
       
       setCanvasSize(width, height);
 
-        // Enhanced high DPI support with improved rendering
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const dpr = Math.min(window.devicePixelRatio || 1, 3); // Support up to 3x for crisp rendering
-          canvas.width = width * dpr;
-          canvas.height = height * dpr;
-          canvas.style.width = `${width}px`;
-          canvas.style.height = `${height}px`;
-          ctx.scale(dpr, dpr);
-          
-          // Enhanced rendering settings for smoother drawing
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = 'high';
-          
-          // Better antialiasing
-          ctx.translate(0.5, 0.5);
-          ctx.translate(-0.5, -0.5);
-        }
+      // Enhanced high DPI support for mobile screens
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2); // Limit to 2x for performance
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.scale(dpr, dpr);
+        
+        // Mobile-optimized rendering settings
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.imageSmoothingEnabled = true;
+      }
     };
 
     updateCanvasSize();
@@ -110,7 +105,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // Draw all completed strokes with improved smoothing
+    // Draw all completed strokes
     [...strokes, currentStroke].filter(Boolean).forEach(stroke => {
       if (!stroke || stroke.points.length < 2) return;
 
@@ -126,30 +121,12 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         ctx.globalCompositeOperation = 'source-over';
       }
 
-      const points = stroke.points;
-      
-      if (points.length === 2) {
-        // Simple line for two points
-        ctx.moveTo(points[0].x, points[0].y);
-        ctx.lineTo(points[1].x, points[1].y);
-      } else if (points.length > 2) {
-        // Smooth curves using quadratic curves for better drawing experience
-        ctx.moveTo(points[0].x, points[0].y);
-        
-        for (let i = 1; i < points.length - 1; i++) {
-          const currentPoint = points[i];
-          const nextPoint = points[i + 1];
-          
-          // Create control point between current and next point for smoothing
-          const controlX = (currentPoint.x + nextPoint.x) / 2;
-          const controlY = (currentPoint.y + nextPoint.y) / 2;
-          
-          ctx.quadraticCurveTo(currentPoint.x, currentPoint.y, controlX, controlY);
-        }
-        
-        // Draw to the last point
-        const lastPoint = points[points.length - 1];
-        ctx.lineTo(lastPoint.x, lastPoint.y);
+      const firstPoint = stroke.points[0];
+      ctx.moveTo(firstPoint.x, firstPoint.y);
+
+      for (let i = 1; i < stroke.points.length; i++) {
+        const point = stroke.points[i];
+        ctx.lineTo(point.x, point.y);
       }
 
       ctx.stroke();
@@ -163,8 +140,8 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     setIsDrawing(true);
     startDrawing();
@@ -178,13 +155,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-    // Throttle mouse movements for smoother performance
-    requestAnimationFrame(() => {
-      addPoint(x, y);
-    });
+    addPoint(x, y);
   };
 
   const handleMouseUp = () => {
@@ -338,9 +312,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
           onContextMenu={(e) => e.preventDefault()} // Prevent context menu
           style={{
             width: '100%',
-            maxWidth: isMobile ? '420px' : '600px',
+            maxWidth: isMobile ? '350px' : '400px',
             height: 'auto',
-            aspectRatio: isMobile ? '4/3' : '3/2',
+            aspectRatio: isMobile ? '16/10' : '5/3',
             touchAction: 'none', // Critical for preventing scroll while drawing
           }}
         />
