@@ -44,7 +44,7 @@ export class AdminUtils {
   }
 }
 
-// Immediately trigger the image cleanup
+// Immediately trigger the image cleanup again
 AdminUtils.clearAllFishImages()
   .then(result => {
     console.log('✅ Fish images and thumbnails cleanup completed:', result);
