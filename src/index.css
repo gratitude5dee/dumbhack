@@ -39,19 +39,12 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -101,5 +94,59 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Mobile-specific optimizations */
+  @media (max-width: 768px) {
+    body {
+      overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
+    }
+    
+    /* Improve touch targets */
+    button, a, input, select, textarea {
+      min-height: 44px;
+    }
+    
+    /* Smooth scrolling for mobile */
+    html {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}
+
+@layer utilities {
+  /* Mobile touch utilities */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  .prevent-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Safe area utilities */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Mobile viewport utilities */
+  .viewport-height {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
   }
 }

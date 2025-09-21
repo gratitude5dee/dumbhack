@@ -12,8 +12,11 @@ export default {
         "2xl": "1400px",
       },
     },
-    extend: {
-      colors: {
+      extend: {
+        screens: {
+          'xs': '475px', // Extra small devices
+        },
+        colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -57,8 +60,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-      },
-      borderRadius: {
+        },
+        spacing: {
+          'safe-area-inset-top': 'env(safe-area-inset-top)',
+          'safe-area-inset-bottom': 'env(safe-area-inset-bottom)',
+          'safe-area-inset-left': 'env(safe-area-inset-left)',
+          'safe-area-inset-right': 'env(safe-area-inset-right)',
+        },
+        borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
