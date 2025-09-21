@@ -175,29 +175,44 @@ export default function Tank() {
 
             <AnimatePresence>
               {fish.map((fishItem, index) => {
+                // Deterministic pseudo-random function based on fish ID
+                const seedHash = (str: string) => {
+                  let hash = 0;
+                  for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32-bit integer
+                  }
+                  return Math.abs(hash);
+                };
+                
+                const seed = seedHash(fishItem.id + index.toString());
+                const pseudoRandom = (offset = 0) => ((seed + offset) * 9301 + 49297) % 233280 / 233280;
+                
                 // Enhanced distribution algorithm for better spacing
                 const goldenRatio = (1 + Math.sqrt(5)) / 2;
                 const angle = index * 2 * Math.PI / goldenRatio;
-                const radius = Math.sqrt(index + 1) * 12; // Spiral outward
+                const maxRadius = Math.min(35, 8 + index * 1.5); // More gradual spiral
+                const radius = Math.sqrt(index + 1) * (maxRadius / 8);
                 
-                // Convert polar to cartesian with bounds
-                let baseX = 50 + (radius * Math.cos(angle)) / 2;
-                let baseY = 50 + (radius * Math.sin(angle)) / 2;
+                // Convert polar to cartesian with better bounds
+                let baseX = 50 + (radius * Math.cos(angle));
+                let baseY = 50 + (radius * Math.sin(angle));
                 
-                // Add randomization to prevent perfect grid
-                const randomOffsetX = (Math.random() - 0.5) * 15;
-                const randomOffsetY = (Math.random() - 0.5) * 15;
+                // Add deterministic offset to prevent perfect grid
+                const offsetX = (pseudoRandom(1) - 0.5) * 20;
+                const offsetY = (pseudoRandom(2) - 0.5) * 20;
                 
-                const finalX = Math.max(5, Math.min(90, baseX + randomOffsetX));
-                const finalY = Math.max(5, Math.min(90, baseY + randomOffsetY));
+                const finalX = Math.max(8, Math.min(88, baseX + offsetX));
+                const finalY = Math.max(8, Math.min(88, baseY + offsetY));
                 
-                // Varied floating parameters
-                const floatDuration = 15 + Math.random() * 20; // 15-35 seconds
-                const floatDelay = (index * 0.5) + Math.random() * 4; // Staggered start
+                // Deterministic floating parameters
+                const floatDuration = 18 + pseudoRandom(3) * 25; // 18-43 seconds
+                const floatDelay = (index * 0.3) + pseudoRandom(4) * 3; // Staggered start
                 
-                // Gentle floating paths
-                const pathVariationX = 8 + Math.random() * 12; // 8-20% movement
-                const pathVariationY = 6 + Math.random() * 10; // 6-16% movement
+                // Deterministic floating paths
+                const pathVariationX = 6 + pseudoRandom(5) * 12; // 6-18% movement
+                const pathVariationY = 4 + pseudoRandom(6) * 10; // 4-14% movement
                 
                 return (
                   <motion.div
