@@ -2,11 +2,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useDrawingStore } from '@/stores/useDrawingStore';
 import { cn } from '@/lib/utils';
-import { SubmissionModal } from './SubmissionModal';
+
 
 interface DrawingCanvasProps {
   className?: string;
-  onSubmit?: (imageData: string, drawingData: any, userData?: { name: string; phone: string }) => void;
+  onSubmit?: (imageData: string, drawingData: any) => Promise<void>;
   aiEnabled?: boolean;
 }
 
@@ -17,9 +17,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [capturedImageData, setCapturedImageData] = useState<string>('');
   
   const {
     strokes,
@@ -173,24 +171,17 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     handleMouseUp();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!onSubmit || strokes.length === 0) return;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const imageData = canvas.toDataURL('image/png');
-    setCapturedImageData(imageData);
-    setShowSubmissionModal(true);
-  };
-
-  const handleModalSubmit = async (userData: { name: string; phone: string }) => {
-    if (!onSubmit || !capturedImageData) return;
-
     setIsSubmitting(true);
     try {
+      const imageData = canvas.toDataURL('image/png');
       const drawingData = getDrawingData();
-      await onSubmit(capturedImageData, drawingData, userData);
-      setShowSubmissionModal(false);
-      setCapturedImageData('');
+      await onSubmit(imageData, drawingData);
     } catch (error) {
       console.error('Submission failed:', error);
     } finally {
@@ -198,12 +189,6 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     }
   };
 
-  const handleModalClose = () => {
-    if (!isSubmitting) {
-      setShowSubmissionModal(false);
-      setCapturedImageData('');
-    }
-  };
 
   const getAiFeedbackColor = () => {
     if (aiScore === null) return 'border-border';
@@ -274,21 +259,14 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         {onSubmit && (
           <button
             onClick={handleSubmit}
-            disabled={strokes.length === 0}
+            disabled={strokes.length === 0 || isSubmitting}
             className="px-6 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Add to collection!
+            {isSubmitting ? 'Adding...' : 'Add to collection!'}
           </button>
         )}
       </div>
 
-      <SubmissionModal
-        isOpen={showSubmissionModal}
-        onClose={handleModalClose}
-        onSubmit={handleModalSubmit}
-        isSubmitting={isSubmitting}
-        imagePreview={capturedImageData}
-      />
     </div>
   );
 };

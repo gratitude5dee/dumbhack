@@ -174,7 +174,7 @@ const Storefront = () => {
                           <p className="text-sm text-muted-foreground mt-2">Draw a Labubu while you wait!</p>
                         </div>
                         <div className="mt-4">
-                          <DrawingCanvas onSubmit={() => {/* no-op while drawing */}} aiEnabled={false} />
+                          <DrawingCanvas onSubmit={async () => {/* no-op while drawing */}} aiEnabled={false} />
                         </div>
                         <div className="mt-4 text-center text-sm text-muted-foreground">You'll be redirected when processing completes.</div>
                       </div>}
@@ -230,7 +230,7 @@ const Storefront = () => {
                           <p className="text-sm text-muted-foreground mt-2">Draw a Labubu while you wait!</p>
                         </div>
                         <div className="mt-4">
-                          <DrawingCanvas onSubmit={() => {/* no-op */}} aiEnabled={false} />
+                          <DrawingCanvas onSubmit={async () => {/* no-op */}} aiEnabled={false} />
                         </div>
                         <div className="mt-4 text-center text-sm text-muted-foreground">You'll be redirected when processing completes.</div>
                       </div>}
