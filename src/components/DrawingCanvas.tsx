@@ -186,8 +186,8 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     setLastTouchTime(now);
 
     const rect = canvas.getBoundingClientRect();
-    const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
     
     // Pressure sensitivity for supported devices
     const pressure = (touch as any).force || 1;
@@ -213,8 +213,8 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
     
     const pressure = (touch as any).force || 1;
     addPoint(x, y, pressure);
